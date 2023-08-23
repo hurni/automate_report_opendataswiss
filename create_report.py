@@ -10,6 +10,7 @@ import math
 import pandas as pd
 import requests as r
 import time
+from datetime import datetime
 import urllib3
 from sys import exit
 from os import remove
@@ -315,17 +316,23 @@ def create_report(
     df_dep_report = df_dep_report.style.set_properties(
         **{"background-color": "black", "color": "white", "border-color": "white"}
     )
+    df_top_report_html = df_top_report.to_html(header=False, index=False)
+    df_fed_report_html = df_fed_report.to_html(header=False, index=False)
+    df_dep_report_html = df_dep_report.to_html(header=False, index=False)
 
-    text = f'<p style="background-color:black;color:white;">On opendata.swiss, a total of {len(listed_organizations)} organizations \
+    now = datetime.now()
+    now = now.strftime("%d-%m-%Y %H:%M:%S")
+
+    text = f'<p style="background-color:black;color:white;">As of {now}, on opendata.swiss, a total of {len(listed_organizations)} organizations \
 are listed. However, {len(organizations)} organizations are actually publishing data.<br>\
 In total, there are {sum(nr_packages)} datasets with {total_resources} ressources on \
 opendata.swiss. {len(geocat)} are originating from geocat. The maximum number of ressources of any dataset is {max_resources}.<br><br>\
 The ten most active organizations are:<br><br> \
-{df_top_report.to_html(header=False, index=False)}<br><br>Considering federal \
+{df_top_report_html}<br><br>Considering federal \
 levels, the distribution of datasets is as follows:<br><br>\
-{df_fed_report.to_html(header=False, index=False)}<br><br>In total, {len_dep} organizations of the federal level are \
+{df_fed_report_html}<br><br>In total, {len_dep} organizations of the federal level are \
 publishing their data on opendata.swiss. The organizations and the corresponding datasets are as follows:<br><br>\
-{df_dep_report.to_html(header=False, index=False)}<br><br></p>'
+{df_dep_report_html}<br><br></p>'
 
     with open("report_header.html", "w") as file:
         file.write(text)
